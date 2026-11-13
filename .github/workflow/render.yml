@@ -1,0 +1,47 @@
+name: Render sleep screen
+
+on:
+  schedule:
+    - cron: "17 * * * *"        # every hour (GitHub may delay scheduled runs by a few minutes)
+  workflow_dispatch: {}          # "Run workflow" button
+  push:
+    branches: [main]
+    paths: [config.json, render.js, core.js, package.json, ".github/workflows/render.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: render
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Brussels
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install fonts
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Render
+        run: node render.js
+
+      - name: Publish to the "output" branch
+        run: |
+          cd out
+          git init -q -b output
+          git config user.name "sleep-screen-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Render $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" output
