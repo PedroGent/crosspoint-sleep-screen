@@ -2,7 +2,7 @@ name: Render sleep screen
 
 on:
   schedule:
-    - cron: "17 * * * *"        # every hour (GitHub may delay scheduled runs by a few minutes)
+    - cron: "0 0-23 * * *"        # every hour (GitHub may delay scheduled runs by a few minutes)
   workflow_dispatch: {}          # "Run workflow" button
   push:
     branches: [main]
