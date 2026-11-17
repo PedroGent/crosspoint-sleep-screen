@@ -2,33 +2,31 @@ name: Render sleep screen
 
 on:
   schedule:
-    - cron: "17 * * * *"        # every hour (GitHub may delay scheduled runs by a few minutes)
-  workflow_dispatch: {}          # "Run workflow" button
+    - cron: "0 * * * *"        # best-effort backup only: GitHub may delay or drop scheduled runs
+  workflow_dispatch: {}          # "Run workflow" button, and the API call used by an external scheduler
   push:
     branches: [main]
-    paths: [config.json, render.js, core.js, package.json, ".github/workflows/render.yml"]
+    paths: [config.json, render.js, core.js, package.json, "fonts/**", ".github/workflows/render.yml"]
 
 permissions:
   contents: write
 
 concurrency:
   group: render
-  cancel-in-progress: true
+  cancel-in-progress: false      # never cancel a run that is publishing
 
 jobs:
   render:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04        # pinned: "ubuntu-latest" is moving to a newer image
+    timeout-minutes: 10
     env:
       TZ: Europe/Brussels
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
-
-      - name: Install fonts
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
