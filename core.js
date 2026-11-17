@@ -81,7 +81,7 @@
     return 'https://api.open-meteo.com/v1/forecast?latitude=' + cfg.lat + '&longitude=' + cfg.lon +
       '&current=temperature_2m,weather_code,wind_speed_10m' +
       '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-      '&timezone=auto&forecast_days=4&wind_speed_unit=kmh';
+      '&timezone=auto&forecast_days=5&wind_speed_unit=kmh';
   }
 
   /* ---------- drawing ---------- */
@@ -202,7 +202,7 @@
     const L = STR[cfg.lang] || STR.en, loc = L.loc, text = T.text, rule = T.rule;
     const cur = wx.current, d0 = wx.daily, ck = kindOf(cur.weather_code);
     text(cap(now.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' })), 24, 46, 30, 'left', '#000', 'bold', 'alphabetic', 432);
-    text(subline(cfg, L, now), 24, 76, 18, 'left', '#000', 'normal', 'alphabetic', 432);
+    text(subline(cfg, L, wx._fetchedAt ? new Date(wx._fetchedAt) : now), 24, 76, 18, 'left', '#000', 'normal', 'alphabetic', 432);
     rule(24, 90, 432);
     icon(ctx, ck, 96, 168, 128);
     text(Math.round(cur.temperature_2m) + '°', 190, 185, 76);
@@ -229,7 +229,7 @@
     const cur = wx.current, d0 = wx.daily, ck = kindOf(cur.weather_code);
     const lx = 24, lw = 352, col = lw / 3;          // left panel
     text(cap(now.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' })), lx, 40, 26, 'left', '#000', 'bold', 'alphabetic', lw);
-    text(subline(cfg, L, now), lx, 66, 17, 'left', '#000', 'normal', 'alphabetic', lw);
+    text(subline(cfg, L, wx._fetchedAt ? new Date(wx._fetchedAt) : now), lx, 66, 17, 'left', '#000', 'normal', 'alphabetic', lw);
     rule(lx, 78, lw);
     icon(ctx, ck, 90, 146, 112);
     text(Math.round(cur.temperature_2m) + '°', 162, 158, 68);
